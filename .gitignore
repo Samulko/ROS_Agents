@@ -1,0 +1,67 @@
+# ROS specific
+build/
+devel/
+install/
+logs/
+.catkin_workspace
+
+# Python
+*.py[cod]
+__pycache__/
+*.so
+
+# Environment variables
+.env
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor specific
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases
+*.sql
+*.sqlite
+
+# ROS package artifacts
+msg_gen/
+srv_gen/
+
+# Aider
+.aider.chat.history.md
+.aider.input.history
+
+# Virtual environment
+aider_venv/
+aider_venv_311/
+.aider*
+.env
+
