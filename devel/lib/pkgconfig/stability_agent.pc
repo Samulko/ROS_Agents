@@ -1,0 +1,8 @@
+prefix=/home/samko/Documents/GitHub/ros_noetic_311/devel
+
+Name: stability_agent
+Description: Description of stability_agent
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs multi_agent_system message_runtime

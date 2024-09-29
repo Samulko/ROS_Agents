@@ -1,0 +1,8 @@
+prefix=/home/samko/Documents/GitHub/ros_noetic_311/devel
+
+Name: structural_engineer_agent
+Description: Description of structural_engineer_agent
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs multi_agent_system

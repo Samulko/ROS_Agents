@@ -1,0 +1,5 @@
+string task
+---
+bool is_safe
+string modifications
+string stability_aware_plan

@@ -1,0 +1,30 @@
+{
+  "procedures": [
+    {
+      "name": "Simple Portal Frame Disassembly",
+      "description_of_structure": [
+        "Simple portal frame structure",
+        "Three elements: two vertical columns and one horizontal beam",
+        "Material not specified (assumed to be standard construction material like timber, steel or concrete)",
+        "All elements have the same dimensions",
+        "Forms a basic 'П' shape",
+        "Element numbering - Column on the left = 1, beam = 2, column on right = 3"
+      ],
+      "components": ["column 1", "beam 2", "column 3"],
+      "disassembly_instructions": [
+        "Support the beam (element 2) to secure the structure",
+        "Disconnect the vertical column (1) from below of beam (2), which is being supported by you, the robot",
+        "The worker should carefully remove the disconnected column 1 using the appropriate tools",
+        "Carefully remove the disconnected column (3) using the appropriate tools",
+        "The robot removes the beam (2), that is being supported last"
+      ],
+      "safety_notes": [
+        "Ensure all workers wear appropriate personal protective equipment (PPE) including hard hats, safety glasses, and steel-toed boots",
+        "Use certified lifting equipment and rigging appropriate for the weight and size of the elements",
+        "Keep the work area clear of unnecessary personnel during the disassembly process",
+        "Be cautious of potential instability once joints are disconnected",
+        "If the structure is made of concrete, be aware of potential dust hazards and use appropriate dust control measures"
+      ]
+    }
+  ]
+}

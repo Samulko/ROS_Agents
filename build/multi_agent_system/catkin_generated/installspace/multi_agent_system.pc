@@ -1,0 +1,8 @@
+prefix=/home/samko/Documents/GitHub/ros_noetic_311/install
+
+Name: multi_agent_system
+Description: Description of multi_agent_system
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: roscpp rospy std_msgs message_runtime

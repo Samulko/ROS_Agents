@@ -1,0 +1,55 @@
+<launch>
+    <!-- Start roscore implicitly -->
+    
+    <!-- Set environment variable for OpenAI API Key -->
+    <param name="/openai_api_key" value="$(env OPENAI_API_KEY)" />
+
+    <!-- Define the run_tests argument with a default value of false -->
+    <arg name="run_tests" default="false" />
+
+    <!-- Define the run_id argument with a default value -->
+    <arg name="run_id" default="$(anon run)" />
+
+    <!-- User Input Node -->
+    <node name="user_input_node" pkg="multi_agent_system" type="user_input.py" output="screen">
+        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    </node>
+
+    <!-- Manager Agent Node -->
+    <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen">
+        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    </node>
+
+    <!-- Structural Engineer Agent Node -->
+    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen">
+        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    </node>
+
+    <!-- Planning Agent Node -->
+    <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen">
+        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+        <env name="PYTHONUNBUFFERED" value="1" />
+    </node>
+
+    <!-- Stability Agent Node -->
+    <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen">
+        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    </node>
+
+    <!-- Agent Responses Logger Node -->
+    <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">
+        <env name="PYTHONUNBUFFERED" value="1" />
+    </node>
+
+    <!-- Output the log file path -->
+    <node name="log_file_path_publisher" pkg="multi_agent_system" type="log_file_path_publisher.py" output="screen">
+        <param name="log_file_path" value="$(find multi_agent_system)/../data/responses/agent_responses_$(arg run_id).log" />
+    </node>
+
+    <!-- Add any other nodes that the Planning Agent depends on -->
+    <!-- For example, if there's a robot control node: -->
+    <!-- <node name="robot_control" pkg="robot_control" type="robot_control_node.py" output="screen" /> -->
+
+    <!-- You can add more nodes here as needed -->
+
+</launch>

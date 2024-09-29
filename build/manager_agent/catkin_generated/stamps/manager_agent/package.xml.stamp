@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>manager_agent</name>
+  <version>0.0.0</version>
+  <description>The manager_agent package</description>
+
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>multi_agent_system</build_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>multi_agent_system</build_export_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>multi_agent_system</exec_depend>
+  <build_depend>rostest</build_depend>
+  <build_export_depend>rostest</build_export_depend>
+  <exec_depend>rostest</exec_depend>
+  <test_depend>rostest</test_depend>
+  <!-- Removed dependency on structural_engineer_agent -->
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,8 @@
+<launch>
+  <param name="/openai_api_key" value="$(env OPENAI_API_KEY)" />
+  <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" />
+  <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" />
+  <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" />
+  
+  <test test-name="test_manager_agent" pkg="manager_agent" type="test_manager_agent.py" time-limit="60.0" />
+</launch>

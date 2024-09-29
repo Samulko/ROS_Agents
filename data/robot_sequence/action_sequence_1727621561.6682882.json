@@ -1,0 +1,27 @@
+{
+    "human_working": true,
+    "selected_element": "structure",
+    "planning_sequence": [
+        "human_action: conduct inspection of the structure",
+        "human_action: assemble tools and equipment",
+        "moveto(support_position, beam_2)",
+        "holding(support_position, beam_2)",
+        "moveto(disconnect_position, vertical_column_1)",
+        "picking(disconnect_position, vertical_column_1)",
+        "human_action: disconnect vertical column 1 from base",
+        "holding(disconnect_position, vertical_column_1)",
+        "moveto(remove_position, vertical_column_1)",
+        "placing(remove_position, vertical_column_1)",
+        "moveto(disconnect_position, vertical_column_3)",
+        "picking(disconnect_position, vertical_column_3)",
+        "human_action: disconnect vertical column 3 from base",
+        "holding(disconnect_position, vertical_column_3)",
+        "moveto(remove_position, vertical_column_3)",
+        "placing(remove_position, vertical_column_3)",
+        "moveto(lower_position, beam_2)",
+        "holding(lower_position, beam_2)",
+        "placing(lower_position, beam_2)",
+        "human_action: conduct final inspection",
+        "human_action: document disassembly process"
+    ]
+}

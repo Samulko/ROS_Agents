@@ -1,0 +1,101 @@
+# How to Run the Multi-Agent System ROS Application
+
+## Prerequisites
+
+1. **Install ROS (Robot Operating System):**
+   Follow the official ROS installation guide for your operating system. For example, for Ubuntu, you can use the following commands:
+
+   ```bash
+   sudo apt update
+   sudo apt install ros-noetic-desktop-full
+   ```
+
+   After installation, initialize rosdep:
+
+   ```bash
+   sudo rosdep init
+   rosdep update
+   ```
+
+   Set up your environment:
+
+   ```bash
+   echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+2. **Install Python and pip:**
+   Ensure you have Python 3 and pip installed. You can install them using:
+
+   ```bash
+   sudo apt update
+   sudo apt install python3 python3-pip
+   ```
+
+3. **Install ROS Python dependencies:**
+   Install the necessary ROS Python packages:
+
+   ```bash
+   sudo apt install python3-rospy python3-roslaunch python3-rosdep
+   ```
+
+4. **Install additional Python packages:**
+   Navigate to the root directory of your project and install the required Python packages using pip:
+
+   ```bash
+   pip3 install -r requirements.txt
+   ```
+
+## Setting Up Environment Variables
+
+1. **Create a .env file:**
+   In the root directory of your project, create a `.env` file and add your OpenAI API key:
+
+   ```bash
+   touch .env
+   echo "OPENAI_API_KEY=your_openai_api_key_here" >> .env
+   ```
+
+   Replace `your_openai_api_key_here` with your actual OpenAI API key.
+
+## Running the Application
+
+1. **Start the ROS Launch File:**
+   Ensure that the ROS launch file is running and all necessary nodes are active. Open a terminal and run:
+
+   ```bash
+   roslaunch multi_agent_system multi_agent_system.launch
+   ```
+
+   This command will start the ROS master, the `manager_agent` node, the `structural_engineer_agent` node, the `stability_agent` node, the `agent_responses_logger` node, and any other necessary nodes.
+
+2. **Manually Publish a Message to the /user_command Topic:**
+   In another terminal, use the `rostopic pub` command to manually publish a message to the `/user_command` topic:
+
+   ```bash
+   rostopic pub -1 /user_command std_msgs/String "data: 'Disassemble a frame consisting of 3 elements, two columns and a beam'"
+   ```
+
+   This command will send the specified message to the `manager_agent` node.
+
+3. **Listen to the /user_feedback Topic:**
+   In another terminal, use the `rostopic echo` command to listen to the `/user_feedback` topic to see the response from the `manager_agent`:
+
+   ```bash
+   rostopic echo /user_feedback
+   ```
+
+   This will display the feedback messages received by the `manager_agent` node.
+
+## Troubleshooting
+
+- **ROS Master Not Running:**
+  If you encounter an error indicating that the ROS master is not running, ensure that you have started the ROS master using the `roslaunch` command mentioned above.
+
+- **Missing OpenAI API Key:**
+  If the `manager_agent` node logs an error about a missing OpenAI API key, ensure that you have correctly added your API key to the `.env` file and that the file is in the root directory of your project.
+
+- **Dependency Issues:**
+  If you encounter issues with missing dependencies, ensure that you have installed all the required Python packages using the `pip3 install -r requirements.txt` command.
+
+By following these steps, you should be able to successfully run the Multi-Agent System ROS application and interact with it using ROS topics.
