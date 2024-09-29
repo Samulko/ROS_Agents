@@ -4,11 +4,13 @@ devel/
 install/
 logs/
 .catkin_workspace
+*.bag
 
 # Python
 *.py[cod]
 __pycache__/
 *.so
+*.ipynb_checkpoints/
 
 # Environment variables
 .env
@@ -48,6 +50,7 @@ Thumbs.db
 *.zip
 
 # Logs and databases
+*.log
 *.sql
 *.sqlite
 
@@ -63,5 +66,4 @@ srv_gen/
 aider_venv/
 aider_venv_311/
 .aider*
-.env
 
