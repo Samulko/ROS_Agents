@@ -1,4 +1,23 @@
-#!/usr/bin/env python3
+#!/home/samko/Documents/GitHub/ros_noetic_311/venv_ros_noetic/bin/python
+
+import sys
+import os
+print(f"Python interpreter: {sys.executable}")
+print(f"Python path: {sys.path}")
+print(f"Current working directory: {os.getcwd()}")
+
+import site
+site_packages = site.getsitepackages()
+for path in site_packages:
+    if path not in sys.path:
+        sys.path.append(path)
+print(f"Updated Python path: {sys.path}")
+
+try:
+    import instructor
+    print("Successfully imported instructor")
+except ImportError as e:
+    print(f"Failed to import instructor: {e}")
 
 import rospy
 from std_msgs.msg import String
@@ -7,7 +26,6 @@ from multi_agent_system.srv import PlanExecution, PlanExecutionResponse
 from openai import OpenAI
 from pydantic import Field
 from typing import List, cast
-import instructor
 from instructor import OpenAISchema
 from dotenv import load_dotenv
 import os
@@ -216,5 +234,9 @@ if __name__ == '__main__':
         planning_agent = PlanningAgent()
         rospy.loginfo("Planning Agent: Ready to receive plan execution requests.")
         rospy.spin()
+    except KeyboardInterrupt:
+        rospy.loginfo("Planning Agent: Shutting down...")
     except rospy.ROSInterruptException:
         pass
+    finally:
+        rospy.loginfo("Planning Agent: Shutdown complete.")

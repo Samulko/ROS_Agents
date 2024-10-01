@@ -61,15 +61,10 @@ srv_gen/
 # Aider
 .aider.chat.history.md
 .aider.input.history
-/aider
+/aider/
 
 # Virtual environment
 aider_venv/
 aider_venv_311/
 .aider*
 /venv_ros_noetic/
-/aider
-
-# Additional ignored files
-.cursorignore
-debug

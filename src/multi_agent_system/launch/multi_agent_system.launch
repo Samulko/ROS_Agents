@@ -26,9 +26,8 @@
     </node>
 
     <!-- Planning Agent Node -->
-    <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen">
+   <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen">
         <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-        <env name="PYTHONUNBUFFERED" value="1" />
     </node>
 
     <!-- Stability Agent Node -->

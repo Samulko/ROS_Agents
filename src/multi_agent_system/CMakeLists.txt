@@ -21,13 +21,18 @@ add_service_files(
   StabilityAnalysis.srv
 )
 
+catkin_python_setup()
+
 generate_messages(
   DEPENDENCIES
   std_msgs
 )
 
 catkin_package(
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+  CATKIN_DEPENDS rospy std_msgs roscpp message_runtime
+  INCLUDE_DIRS
+  LIBRARIES
+  CATKIN_DEPENDS
 )
 
 include_directories(
