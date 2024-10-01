@@ -69,3 +69,7 @@ aider_venv_311/
 .aider*
 /venv_ros_noetic/
 /aider
+
+# Additional ignored files
+.cursorignore
+debug
