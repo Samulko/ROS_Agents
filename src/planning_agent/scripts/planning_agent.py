@@ -5,14 +5,17 @@ from std_msgs.msg import String
 import json
 from multi_agent_system.srv import PlanExecution, PlanExecutionResponse
 import openai
-from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from pydantic import Field
 from typing import List
 import instructor
 from instructor import OpenAISchema
+from dotenv import load_dotenv
 import os
 import time
+
+# Load environment variables from .env file
+load_dotenv()
 
 class RoboticAction(OpenAISchema):
     """
@@ -135,27 +138,11 @@ class PlanningAgent:
         5. Support actions follow this pattern: moveto -> holding, and continue holding in subsequent steps
         6. Use 'deposition_zone' as the destination for removed elements.
         7. Each actor maintains their assigned role consistently throughout the entire sequence as per the numbered instructions.
-
-        Note: Your response will be automatically parsed into a structure like this:
-        {{
-            "actions": [
-                {{
-                    "human_working": boolean,
-                    "selected_element": "element_name",
-                    "planning_sequence": ["action1", "action2", ...]
-                }},
-                ...
-            ]
-        }}
-
-        Planning Agent, please provide the structured action sequence based on the given disassembly plan, ensuring clear collaboration between actors, maintaining continuous support of elements as specified, and keeping each actor in their assigned role throughout the entire process as defined in the numbered Disassembly Instructions.
-        Re-evaluate your plan and make sure it matches the numbered disassembly sequence plan exactly, maintaining consistent roles for each actor as specified in those instructions.
         """
         try:
             action_sequence = self.client.chat.completions.create(
-                model="gpt-4-0613",
+                model="gpt-4",
                 response_model=ActionSequence,
-                temperature=0.6,
                 messages=[
                     {"role": "system", "content": "You are a planning agent that translates disassembly plans into structured action sequences."},
                     {"role": "user", "content": prompt}
@@ -204,7 +191,7 @@ class PlanningAgent:
         json_file_path = os.path.join(robot_sequence_dir, json_file_name)
         
         with open(json_file_path, 'w') as json_file:
-            json.dump(action_sequence.dict(), json_file, indent=4)
+            json.dump(action_sequence.model_dump(), json_file, indent=4)
         rospy.loginfo(f"Planning Agent: Action sequence JSON file created at {json_file_path}")
         
         # Print the contents of the JSON file
