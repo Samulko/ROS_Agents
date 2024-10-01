@@ -16,24 +16,16 @@
     </node>
 
     <!-- Manager Agent Node -->
-    <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen">
-        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    </node>
+    <node name="manager_agent" pkg="manager_agent" type="run_manager_agent.sh" output="screen" />
 
     <!-- Structural Engineer Agent Node -->
-    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen">
-        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    </node>
+    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="run_structural_engineer_agent.sh" output="screen" />
 
     <!-- Planning Agent Node -->
-   <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen">
-        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    </node>
+    <node name="planning_agent" pkg="planning_agent" type="run_planning_agent.sh" output="screen" />
 
     <!-- Stability Agent Node -->
-    <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen">
-        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    </node>
+    <node name="stability_agent" pkg="stability_agent" type="run_stability_agent.sh" output="screen" />
 
     <!-- Agent Responses Logger Node -->
     <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">
