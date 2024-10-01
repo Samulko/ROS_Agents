@@ -1,8 +1,8 @@
 # ROS specific
-build/
-devel/
-install/
-logs/
+/build/
+/devel/
+/install/
+/logs/
 .catkin_workspace
 *.bag
 
@@ -61,10 +61,11 @@ srv_gen/
 # Aider
 .aider.chat.history.md
 .aider.input.history
+/aider
 
 # Virtual environment
 aider_venv/
 aider_venv_311/
 .aider*
-
-venv_ros_noetic/
+/venv_ros_noetic/
+/aider
