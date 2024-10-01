@@ -4,10 +4,9 @@ import rospy
 from std_msgs.msg import String
 import json
 from multi_agent_system.srv import PlanExecution, PlanExecutionResponse
-import openai
 from openai import OpenAI
 from pydantic import Field
-from typing import List
+from typing import List, cast
 import instructor
 from instructor import OpenAISchema
 from dotenv import load_dotenv
@@ -37,10 +36,10 @@ class PlanningAgent:
 
         # Parameters
         self.openai_api_key = rospy.get_param('/openai_api_key')
-        openai.api_key = self.openai_api_key
 
         # Initialize OpenAI client with Instructor
-        self.client = instructor.patch(OpenAI(api_key=self.openai_api_key))
+        openai_client = OpenAI(api_key=self.openai_api_key)
+        self.client = cast(OpenAI, instructor.patch(openai_client))
 
         # Service to execute plans
         self.plan_execution_service = rospy.Service('/plan_execution', PlanExecution, self.handle_plan_execution)
