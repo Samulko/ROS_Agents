@@ -5,12 +5,21 @@
 /logs/
 .catkin_workspace
 *.bag
+msg_gen/
+srv_gen/
 
 # Python
 *.py[cod]
 __pycache__/
 *.so
 *.ipynb_checkpoints/
+
+# Virtual environments
+venv_ros_py310/
+venv_ros_noetic/
+aider_venv/
+aider_venv_311/
+.aider*
 
 # Environment variables
 .env
@@ -37,7 +46,6 @@ Thumbs.db
 *.dll
 *.exe
 *.o
-*.so
 
 # Packages
 *.7z
@@ -54,17 +62,7 @@ Thumbs.db
 *.sql
 *.sqlite
 
-# ROS package artifacts
-msg_gen/
-srv_gen/
-
 # Aider
 .aider.chat.history.md
 .aider.input.history
 /aider/
-
-# Virtual environment
-aider_venv/
-aider_venv_311/
-.aider*
-/venv_ros_noetic/

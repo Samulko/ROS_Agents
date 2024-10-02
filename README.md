@@ -219,3 +219,35 @@ This project implements an advanced Intelligent Robotic Disassembly System, leve
 - Python
 - Natural Language Processing
 - Retrieval-Augmented Generation (RAG) Systems
+
+# Setup Instructions
+
+1. Ensure you have Python 3.10.15 installed
+2. Install virtualenv if you haven't already:
+   ```
+   pip install virtualenv
+   ```
+3. Create a virtual environment:
+   ```
+   virtualenv venv_ros_py310 -p python3.10
+   ```
+4. Activate the virtual environment:
+   ```
+   source venv_ros_py310/bin/activate
+   ```
+5. Install the required packages:
+   ```
+   pip install -r requirements.txt
+   ```
+
+## ROS Noetic Setup
+
+1. Follow the official ROS Noetic installation instructions for your operating system:
+   [ROS Noetic Installation](http://wiki.ros.org/noetic/Installation)
+
+2. After installation, source the ROS setup file:
+   ```
+   source /opt/ros/noetic/setup.bash
+   ```
+
+3. It's recommended to add this line to your ~/.bashrc file to source it automatically on new terminal sessions.

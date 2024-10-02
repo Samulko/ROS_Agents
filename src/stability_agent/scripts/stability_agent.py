@@ -23,7 +23,7 @@ class StabilityAgent:
         self.openai_api_key = rospy.get_param('/openai_api_key')
 
         # Initialize ChatOpenAI
-        self.llm = ChatOpenAI(temperature=0.6, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(temperature=0.6, model="gpt-4-1106-preview", openai_api_key=self.openai_api_key)
 
         # Initialize RAG system
         self.initialize_rag_system()
@@ -84,14 +84,14 @@ class StabilityAgent:
             documents = loader.load()
             if not documents:
                 rospy.logwarn("No documents loaded from stability_assessments.json. Initializing empty vector store.")
-                self.vectorstore = FAISS.from_texts([""], OpenAIEmbeddings(openai_api_key=self.openai_api_key))
+                self.vectorstore = FAISS.from_texts([""], OpenAIEmbeddings())
                 return
 
             text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
             texts = text_splitter.split_documents(documents)
 
             # Create vector store
-            embeddings = OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+            embeddings = OpenAIEmbeddings()
             self.vectorstore = FAISS.from_documents(texts, embeddings)
             rospy.loginfo("RAG system initialized successfully")
         except Exception as e:
@@ -110,7 +110,7 @@ class StabilityAgent:
         """
 
         response = self.llm.invoke(prompt)
-        stability_aware_plan = response.content.strip()
+        stability_aware_plan = response.content if isinstance(response.content, str) else response.content[0]
         return stability_aware_plan
 
     def handle_stability_analysis(self, req):
@@ -118,12 +118,12 @@ class StabilityAgent:
         rospy.loginfo(f"Analyzing stability for task: {task}")
 
         # Retrieve relevant context from the RAG system
-        docs = self.vectorstore.similarity_search(task, k=2)
+        docs = self.vectorstore.similarity_search(task, k=2) if self.vectorstore else []
         context = "\n".join([doc.page_content for doc in docs])
 
         # Use the LLM to analyze stability
         response = self.llm.invoke(self.prompt.format(task=task, context=context))
-        analysis = response.content.strip()
+        analysis = response.content if isinstance(response.content, str) else response.content[0]
 
         # Determine if the task is safe
         is_safe = "safe to execute" in analysis.lower()

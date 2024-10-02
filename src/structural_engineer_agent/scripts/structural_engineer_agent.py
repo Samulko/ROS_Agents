@@ -113,7 +113,7 @@ class StructuralEngineerAgent:
             texts = text_splitter.split_documents(documents)
 
             # Create a vector store for efficient similarity search
-            embeddings = OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+            embeddings = OpenAIEmbeddings()
             self.vectorstore = FAISS.from_documents(texts, embeddings)
             rospy.loginfo("RAG system initialized successfully")
         except Exception as e:
@@ -140,7 +140,7 @@ class StructuralEngineerAgent:
             ]
         )
         
-        disassembly_plan = response.choices[0].message.content.strip()
+        disassembly_plan = response.choices[0].message.content if response.choices else ""
         return disassembly_plan
 
     def handle_validate_request(self, req):
@@ -168,11 +168,10 @@ class StructuralEngineerAgent:
             self.structural_engineer_feedback_pub.publish(f"Validation result: {validation_details}")
 
             # Determine if the request follows standard procedures
-            is_standard = "standard" in validation_details.lower() and "not standard" not in validation_details.lower()
+            is_standard = "standard" in validation_details.lower() if validation_details else False and "not standard" not in validation_details.lower() if validation_details else True
 
             # Generate disassembly plan
-            disassembly_plan = self.generate_disassembly_plan(validation_details)
-
+            disassembly_plan = response.choices[0].message.content if response.choices else ""
             rospy.loginfo(f"StructuralEngineerAgent: Is standard: {is_standard}")
             return ValidateRequestResponse(is_standard=is_standard, validation_details=validation_details, disassembly_plan=disassembly_plan)
         except Exception as e:

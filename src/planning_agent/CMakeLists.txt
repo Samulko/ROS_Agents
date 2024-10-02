@@ -5,13 +5,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   multi_agent_system
-  message_generation
 )
 
-catkin_python_setup()
-
 catkin_package(
-  CATKIN_DEPENDS rospy std_msgs multi_agent_system message_runtime
+  CATKIN_DEPENDS rospy std_msgs multi_agent_system
 )
 
 catkin_install_python(PROGRAMS

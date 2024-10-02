@@ -34,7 +34,7 @@ class ManagerAgent:
             rospy.loginfo("OpenAI API key loaded successfully")
             
             # Initialize ChatOpenAI model
-            self.llm = ChatOpenAI(temperature=0.6, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
+            self.llm = ChatOpenAI(temperature=0.6, model="gpt-4-1106-preview")
 
             # Initialize conversation memory
             self.memory = ConversationBufferMemory(return_messages=True)
@@ -196,24 +196,13 @@ class ManagerAgent:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request follows standard procedures.")
                 
-                # Proceed directly to planning for standard requests
-                if self.plan_execution is None:
-                    rospy.logwarn("[ManagerAgent] Planning Agent service is not available.")
-                    self.user_feedback_pub.publish("I'm sorry, but I can't perform planning at the moment. Please try again later.")
-                    return
+                # Always perform planning, even for standard requests
+                planning_response = self.execute_planning(disassembly_plan)
                 
-                try:
-                    planning_response = self.plan_execution(disassembly_plan)
-                    if planning_response.success:
-                        self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
-                    else:
-                        self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
-                except rospy.ServiceException as e:
-                    rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
-                    self.user_feedback_pub.publish(f"I encountered an error during planning. Please try again.")
-                except Exception as e:
-                    rospy.logerr(f"[ManagerAgent] Unexpected error during planning: {e}")
-                    self.user_feedback_pub.publish(f"An unexpected error occurred during planning. Please try again later.")
+                if planning_response.success:
+                    self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
+                else:
+                    self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
             else:
                 rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Proceeding with stability analysis.")
@@ -233,23 +222,12 @@ class ManagerAgent:
                     self.memory.chat_memory.add_ai_message(f"Stability analysis result: {'Safe' if stability_response.is_safe else 'Unsafe. Modifications required: ' + stability_response.modifications}")
 
                     # Proceed with planning using the stability-aware plan
-                    if self.plan_execution is None:
-                        rospy.logwarn("[ManagerAgent] Planning Agent service is not available.")
-                        self.user_feedback_pub.publish("I'm sorry, but I can't perform planning at the moment. Please try again later.")
-                        return
+                    planning_response = self.execute_planning(stability_aware_plan)
                     
-                    try:
-                        planning_response = self.plan_execution(stability_aware_plan)
-                        if planning_response.success:
-                            self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
-                        else:
-                            self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
-                    except rospy.ServiceException as e:
-                        rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
-                        self.user_feedback_pub.publish(f"I encountered an error during planning. Please try again.")
-                    except Exception as e:
-                        rospy.logerr(f"[ManagerAgent] Unexpected error during planning: {e}")
-                        self.user_feedback_pub.publish(f"An unexpected error occurred during planning. Please try again later.")
+                    if planning_response.success:
+                        self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
+                    else:
+                        self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
                 except rospy.ServiceException as e:
                     rospy.logerr(f"[ManagerAgent] Stability analysis service call failed: {e}")
                     self.user_feedback_pub.publish(f"I encountered an error during stability analysis. Please try again.")
@@ -263,6 +241,21 @@ class ManagerAgent:
         except rospy.ServiceException as e:
             rospy.logerr(f"[ManagerAgent] Service call failed: {e}")
             self.user_feedback_pub.publish(f"I encountered an error while processing your request. Please try again.")
+
+    def execute_planning(self, disassembly_plan):
+        if self.plan_execution is None:
+            rospy.logwarn("[ManagerAgent] Planning Agent service is not available.")
+            self.user_feedback_pub.publish("I'm sorry, but I can't perform planning at the moment. Please try again later.")
+            return PlanExecutionResponse(success=False, execution_details="Planning service unavailable")
+        
+        try:
+            rospy.loginfo(f"[ManagerAgent] Sending plan to Planning Agent: {disassembly_plan}")
+            planning_response = self.plan_execution(disassembly_plan)
+            rospy.loginfo(f"[ManagerAgent] Received response from Planning Agent: {planning_response}")
+            return planning_response
+        except rospy.ServiceException as e:
+            rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
+            return PlanExecutionResponse(success=False, execution_details=f"Planning service error: {str(e)}")
 
     def run_system_test(self):
         rospy.loginfo("[ManagerAgent] Running system test...")

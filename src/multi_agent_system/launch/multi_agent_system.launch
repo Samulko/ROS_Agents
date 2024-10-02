@@ -1,6 +1,4 @@
 <launch>
-    <!-- Start roscore implicitly -->
-    
     <!-- Set environment variable for OpenAI API Key -->
     <param name="/openai_api_key" value="$(env OPENAI_API_KEY)" />
 
@@ -12,20 +10,24 @@
 
     <!-- User Input Node -->
     <node name="user_input_node" pkg="multi_agent_system" type="user_input.py" output="screen">
-        <env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+           <env name="PYTHONPATH" value="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/lib/python3.10/site-packages:$(env PYTHONPATH)"/>
     </node>
 
     <!-- Manager Agent Node -->
-    <node name="manager_agent" pkg="manager_agent" type="run_manager_agent.sh" output="screen" />
+    <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
 
     <!-- Structural Engineer Agent Node -->
-    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="run_structural_engineer_agent.sh" output="screen" />
+    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen" />
 
     <!-- Planning Agent Node -->
-    <node name="planning_agent" pkg="planning_agent" type="run_planning_agent.sh" output="screen" />
+    <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen"
+          launch-prefix="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/bin/python3">
+        <env name="PYTHONPATH" value="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/lib/python3.10/site-packages:$(env PYTHONPATH)"/>
+        <env name="PATH" value="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/bin:$(env PATH)"/>
+    </node>
 
     <!-- Stability Agent Node -->
-    <node name="stability_agent" pkg="stability_agent" type="run_stability_agent.sh" output="screen" />
+    <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen" />
 
     <!-- Agent Responses Logger Node -->
     <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">

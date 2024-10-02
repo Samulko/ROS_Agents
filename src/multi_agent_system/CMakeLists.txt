@@ -21,7 +21,8 @@ add_service_files(
   StabilityAnalysis.srv
 )
 
-catkin_python_setup()
+# Remove this line:
+# catkin_python_setup()
 
 generate_messages(
   DEPENDENCIES
@@ -53,3 +54,4 @@ install(PROGRAMS
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
