@@ -25,7 +25,7 @@ class StabilityAgent:
         # Initialize ChatOpenAI
         self.llm = ChatOpenAI(temperature=0, model="gpt-4o", openai_api_key=self.openai_api_key) # type: ignore
 
-        # Initialize RAG system
+        # Initialize RAG system 
         self.initialize_rag_system()
 
         # Initialize prompt template
