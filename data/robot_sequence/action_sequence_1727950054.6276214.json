@@ -1,0 +1,43 @@
+{
+    "actions": [
+        {
+            "human_working": false,
+            "selected_element": "element_2",
+            "planning_sequence": [
+                "moveto",
+                "holding"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "human_action(carefully remove the disconnected column using appropriate tools)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "element_3",
+            "planning_sequence": [
+                "human_action(carefully remove the disconnected column using appropriate tools)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_2",
+            "planning_sequence": [
+                "picking",
+                "placing"
+            ]
+        }
+    ]
+}

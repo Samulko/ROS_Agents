@@ -1,0 +1,168 @@
+{
+    "actions": [
+        {
+            "human_working": true,
+            "selected_element": "structure",
+            "planning_sequence": [
+                "human_action(Assess the overall condition of the structure to identify any signs of wear, damage, or other conditions that could affect stability during disassembly)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "area_around_structure",
+            "planning_sequence": [
+                "human_action(Clear the area around the structure of any unnecessary personnel, equipment, or debris to create a safe working environment)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "personnel",
+            "planning_sequence": [
+                "human_action(Equip all personnel involved in the disassembly process with appropriate safety gear, including hard hats, safety glasses, gloves, and steel-toed boots)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "non_structural_elements",
+            "planning_sequence": [
+                "human_action(Remove any non-structural elements or additional attachments from the structure to simplify the disassembly process and reduce weight)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "main_elements",
+            "planning_sequence": [
+                "human_action(Identify and label the five main elements of the structure: two upright columns, two horizontal beams (rafters), and one horizontal beam (either a base beam or ridge beam))"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "ridge_beam_or_rafter",
+            "planning_sequence": [
+                "human_action(If the structure has a ridge beam, plan to remove it first. If no ridge beam is present, identify the rafter that appears to be under the least amount of stress for initial removal)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "adjacent_rafter",
+            "planning_sequence": [
+                "moveto",
+                "holding"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "first_rafter",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "upright_columns",
+            "planning_sequence": [
+                "human_action(Continuously monitor the upright columns for any signs of movement or instability as the rafters are removed)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "second_rafter",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "upright_columns",
+            "planning_sequence": [
+                "human_action(Once both rafters are removed, assess the stability of the upright columns again. If they are stable, plan to remove them next)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "first_upright_column",
+            "planning_sequence": [
+                "moveto",
+                "holding"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "first_upright_column",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "remaining_column",
+            "planning_sequence": [
+                "human_action(With one column removed, the remaining column may become more unstable. Ensure that it is braced or supported adequately before proceeding)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "second_upright_column",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "base_beam",
+            "planning_sequence": [
+                "human_action(If a base beam is present and was providing lateral stability, it should be the last element to be removed)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "base_beam",
+            "planning_sequence": [
+                "human_action(Before removing the base beam, ensure that no other components or surrounding structures are relying on it for stability)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "base_beam",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "removed_elements",
+            "planning_sequence": [
+                "human_action(Label and organize all removed elements and hardware for future reassembly or storage)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "disassembly_area",
+            "planning_sequence": [
+                "human_action(Conduct a final cleanup of the area to ensure that all debris is removed and the site is safe)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "disassembly_process",
+            "planning_sequence": [
+                "human_action(Review the disassembly process to identify any issues or lessons learned that can be applied to future tasks)"
+            ]
+        }
+    ]
+}

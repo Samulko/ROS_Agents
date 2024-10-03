@@ -23,7 +23,7 @@ class StabilityAgent:
         self.openai_api_key = rospy.get_param('/openai_api_key')
 
         # Initialize ChatOpenAI
-        self.llm = ChatOpenAI(temperature=0.6, model="gpt-4-1106-preview", openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(temperature=0, model="gpt-4o", openai_api_key=self.openai_api_key) # type: ignore
 
         # Initialize RAG system
         self.initialize_rag_system()
@@ -78,7 +78,7 @@ class StabilityAgent:
                 file_path=assessments_path,
                 jq_schema='.assessments[]',
                 content_key=None,
-                text_content=extract_data
+                text_content=extract_data # type: ignore
             )
 
             documents = loader.load()
@@ -126,8 +126,9 @@ class StabilityAgent:
         analysis = response.content if isinstance(response.content, str) else response.content[0]
 
         # Determine if the task is safe
-        is_safe = "safe to execute" in analysis.lower()
-        modifications = analysis if not is_safe else ""
+        analysis_text = analysis if isinstance(analysis, str) else str(analysis)
+        is_safe = "safe to execute" in analysis_text.lower()
+        modifications = analysis_text if not is_safe else ""
 
         # Generate stability-aware plan
         stability_aware_plan = self.generate_stability_aware_plan(task, analysis)

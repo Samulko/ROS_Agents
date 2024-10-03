@@ -222,20 +222,34 @@ This project implements an advanced Intelligent Robotic Disassembly System, leve
 
 # Setup Instructions
 
-1. Ensure you have Python 3.10.15 installed
-2. Install virtualenv if you haven't already:
+1. Ensure you have pyenv installed. If not, follow the [pyenv installation guide](https://github.com/pyenv/pyenv#installation).
+
+2. Install Python 3.10.15 using pyenv:
    ```
-   pip install virtualenv
+   pyenv install 3.10.15
    ```
-3. Create a virtual environment:
+
+3. Set the local Python version for this project:
    ```
-   virtualenv venv_ros_py310 -p python3.10
+   pyenv local 3.10.15
    ```
-4. Activate the virtual environment:
+
+4. Verify that the correct Python version is being used:
+   ```
+   python --version
+   ```
+
+5. Create a virtual environment using Python's built-in venv module:
+   ```
+   python -m venv venv_ros_py310
+   ```
+
+6. Activate the virtual environment:
    ```
    source venv_ros_py310/bin/activate
    ```
-5. Install the required packages:
+
+7. Install the required packages:
    ```
    pip install -r requirements.txt
    ```

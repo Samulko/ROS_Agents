@@ -1,0 +1,54 @@
+{
+    "actions": [
+        {
+            "human_working": false,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_2",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_3",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_4",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_5",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        }
+    ]
+}

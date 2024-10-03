@@ -48,7 +48,7 @@ class StructuralEngineerAgent:
                    a. Clearly communicate to the manager agent that the structure does not match any in the RAG system.
                 4. In case of partial matches or ambiguities:
                    a. Explain the nature of the partial match or ambiguity.
-                   b. If the match is close to what is described, respond positively and pass the matching description.
+                   b. If the match is close to what is described, but does not match the number of elements of structural types, respond negatively by saying structure is not standard.
                    c. Request more information if needed.
 
                 Current request: {request}
@@ -61,7 +61,7 @@ class StructuralEngineerAgent:
                 3. Based on the result:
                    a. For a full match: Confirm the match and pass the information on the proper disassembly sequence as it is described in the RAG to the manager agent for further processing. In this case you must mention the proceedure is standard.
                    b. For no match: Clearly state that no matching structure was found in the RAG system. You must mention the proceedure is not standard.
-                   c. For partial matches or ambiguities: Explain the situation and indicate what additional information might be needed. If the match is close but not a full match, pass the closest structure to the manager. You must mention that the proceedure is standard.
+                   c. For partial matches or ambiguities: Explain the situation. If the match is close but not a full match - for instance the structure description does not match the number of elements of structural types, respond negatively by saying structure is not standard.
                    d. Mention either that the proceedure is standard or not standard.
 
                 Analysis and Validation Result:
@@ -156,8 +156,8 @@ class StructuralEngineerAgent:
 
             # Use the OpenAI client to validate the request
             response = self.client.chat.completions.create(
-                temperature=0.6,
-                model="gpt-4o-mini",
+                temperature=0,
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": self.prompt.format(request=request, context=context)},
                     {"role": "user", "content": request}
@@ -168,7 +168,7 @@ class StructuralEngineerAgent:
             self.structural_engineer_feedback_pub.publish(f"Validation result: {validation_details}")
 
             # Determine if the request follows standard procedures
-            is_standard = "standard" in validation_details.lower() if validation_details else False and "not standard" not in validation_details.lower() if validation_details else True
+            is_standard = "standard" in validation_details.lower() and "not standard" not in validation_details.lower() # type: ignore
 
             # Generate disassembly plan
             disassembly_plan = response.choices[0].message.content if response.choices else ""

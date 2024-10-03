@@ -157,14 +157,14 @@ class PlanningAgent:
         """
         try:
             action_sequence = self.client.chat.completions.create(
-                model="gpt-4-1106-preview",
+                model="gpt-4o",
                 response_model=ActionSequence,
                 temperature=0,
                 messages=[
                     {"role": "system", "content": "You are a planning agent that translates disassembly plans into structured action sequences."},
                     {"role": "user", "content": prompt}
                 ]
-            )
+            ) # type: ignore
             logging.info(f"Planning Agent: Translated plan into action sequence: {action_sequence}")
             return action_sequence
         except Exception as e:

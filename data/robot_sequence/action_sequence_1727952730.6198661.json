@@ -1,0 +1,53 @@
+{
+    "actions": [
+        {
+            "human_working": false,
+            "selected_element": "element_2",
+            "planning_sequence": [
+                "moveto",
+                "holding"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "human_action(Support beam 2 to secure the structure)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "element_1",
+            "planning_sequence": [
+                "human_action(Carefully remove the disconnected column 1 using appropriate tools)"
+            ]
+        },
+        {
+            "human_working": true,
+            "selected_element": "element_3",
+            "planning_sequence": [
+                "human_action(Carefully remove the disconnected column 3 using appropriate tools)"
+            ]
+        },
+        {
+            "human_working": false,
+            "selected_element": "element_2",
+            "planning_sequence": [
+                "moveto",
+                "picking",
+                "holding",
+                "placing"
+            ]
+        }
+    ]
+}

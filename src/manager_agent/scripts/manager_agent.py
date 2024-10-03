@@ -14,6 +14,7 @@ from langchain.chains import LLMChain
 from dotenv import load_dotenv
 import os
 import sys
+import time
 
 # Load environment variables from .env file
 load_dotenv()
@@ -34,7 +35,7 @@ class ManagerAgent:
             rospy.loginfo("OpenAI API key loaded successfully")
             
             # Initialize ChatOpenAI model
-            self.llm = ChatOpenAI(temperature=0.6, model="gpt-4-1106-preview")
+            self.llm = ChatOpenAI(temperature=0, model="gpt-4o")
 
             # Initialize conversation memory
             self.memory = ConversationBufferMemory(return_messages=True)
@@ -94,6 +95,16 @@ class ManagerAgent:
             self.user_feedback_pub = rospy.Publisher('/user_feedback', String, queue_size=10)
             self.manager_response_pub = rospy.Publisher('/manager_response', String, queue_size=10)
 
+            # Add a new publisher for logging entire conversations
+            self.conversation_log_pub = rospy.Publisher('/conversation_log', String, queue_size=100)
+
+            # Initialize a conversation log
+            self.conversation_log = []
+
+            # Create a timestamped log file name
+            self.log_file_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'conversation_logs', f'conversation_log_{int(time.time())}.txt')
+            os.makedirs(os.path.dirname(self.log_file_path), exist_ok=True)
+
             # Try to connect to the Structural Engineer Agent and Stability Agent services
             rospy.Timer(rospy.Duration(1), self.try_connect_services)
 
@@ -112,10 +123,8 @@ class ManagerAgent:
                 rospy.wait_for_service('/validate_request', timeout=1)
                 self.validate_request = rospy.ServiceProxy('/validate_request', ValidateRequest)
                 rospy.loginfo("Connected to /validate_request service")
-            except rospy.ROSException:
-                rospy.logwarn("Waiting for /validate_request service...")
-            except rospy.ROSInterruptException:
-                rospy.logwarn("ROS master is not running. Unable to connect to /validate_request service.")
+            except (rospy.ROSException, rospy.ROSInterruptException) as e:
+                rospy.logwarn(f"Waiting for /validate_request service... Error: {str(e)}")
 
         # Attempt to connect to the Stability Agent service
         if self.stability_analysis is None:
@@ -123,10 +132,8 @@ class ManagerAgent:
                 rospy.wait_for_service('/stability_analysis', timeout=1)
                 self.stability_analysis = rospy.ServiceProxy('/stability_analysis', StabilityAnalysis)
                 rospy.loginfo("Connected to /stability_analysis service")
-            except rospy.ROSException:
-                rospy.logwarn("Waiting for /stability_analysis service...")
-            except rospy.ROSInterruptException:
-                rospy.logwarn("ROS master is not running. Unable to connect to /stability_analysis service.")
+            except (rospy.ROSException, rospy.ROSInterruptException) as e:
+                rospy.logwarn(f"Waiting for /stability_analysis service... Error: {str(e)}")
 
         # Attempt to connect to the Planning Agent service
         if self.plan_execution is None:
@@ -135,10 +142,8 @@ class ManagerAgent:
                 self.plan_execution = rospy.ServiceProxy('/plan_execution', PlanExecution)
                 rospy.loginfo("Connected to /plan_execution service")
                 self.user_feedback_pub.publish("Planning Agent is connected and ready to work.")
-            except rospy.ROSException:
-                rospy.logwarn("Waiting for /plan_execution service...")
-            except rospy.ROSInterruptException:
-                rospy.logwarn("ROS master is not running. Unable to connect to /plan_execution service.")
+            except (rospy.ROSException, rospy.ROSInterruptException) as e:
+                rospy.logwarn(f"Waiting for /plan_execution service... Error: {str(e)}")
 
         # Check if ROS master is running
         if rospy.is_shutdown():
@@ -147,9 +152,8 @@ class ManagerAgent:
 
     def handle_user_command(self, msg):
         try:
-            # Process incoming user commands
             user_command = msg.data
-            rospy.loginfo(f"[ManagerAgent] Received user command: {user_command}")
+            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Received user command: {{}}".format(rospy.get_time(), user_command))
 
             # Always publish an initial acknowledgment
             self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
@@ -157,24 +161,38 @@ class ManagerAgent:
 
             # Use the language model to interpret the command
             try:
-                rospy.loginfo(f"[ManagerAgent] Invoking language model for command: {user_command}")
+                self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Invoking language model for command: {{}}".format(rospy.get_time(), user_command))
                 response = self.llm.invoke(input=f"Interpret this command for disassembling a simple portal frame: {user_command}")
-                interpreted_command = response.content.strip()
-                rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
+                interpreted_command = response.content
+                if isinstance(interpreted_command, list):
+                    interpreted_command = interpreted_command[0] if interpreted_command else ""
+                interpreted_command = str(interpreted_command).strip()
+                self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Interpreted command: {{}}".format(rospy.get_time(), interpreted_command))
 
                 # Process the interpreted command
                 self.process_command(interpreted_command)
             except Exception as e:
-                rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
+                error_message = f"[ManagerAgent] Error interpreting command: {e}"
+                self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
                 self.user_feedback_pub.publish(f"Error interpreting command: {e}. Please try again.")
         except rospy.ROSInterruptException:
-            rospy.logerr("ROS master is not running. Unable to process user command.")
+            error_message = "ROS master is not running. Unable to process user command."
+            self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
             self.user_feedback_pub.publish("Error: ROS master is not running. Please start roscore and try again.")
         except Exception as e:
-            rospy.logerr(f"[ManagerAgent] Unexpected error handling user command: {e}")
+            error_message = f"[ManagerAgent] Unexpected error handling user command: {e}"
+            self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
             self.user_feedback_pub.publish(f"An unexpected error occurred. Please try again later.")
         finally:
-            rospy.loginfo("[ManagerAgent] Finished processing user command")
+            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Finished processing user command".format(rospy.get_time()))
+
+    def log_conversation(self, message):
+        self.conversation_log.append(message)
+        self.conversation_log_pub.publish(message)
+        
+        # Append the message to the log file
+        with open(self.log_file_path, 'a') as f:
+            f.write(message + '\n')
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents
@@ -192,11 +210,13 @@ class ManagerAgent:
             validation_response = self.validate_request(command)
             disassembly_plan = validation_response.disassembly_plan
 
+            self.log_conversation(f"[INFO] [{{:.6f}}]: StructuralEngineerAgent: Validation result: {{}}".format(rospy.get_time(), validation_response.validation_details))
+
             if validation_response.is_standard:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request follows standard procedures.")
                 
-                # Always perform planning, even for standard requests
+                # Proceed with planning for standard requests
                 planning_response = self.execute_planning(disassembly_plan)
                 
                 if planning_response.success:
@@ -239,7 +259,8 @@ class ManagerAgent:
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
             
         except rospy.ServiceException as e:
-            rospy.logerr(f"[ManagerAgent] Service call failed: {e}")
+            error_message = f"[ManagerAgent] Service call failed: {e}"
+            self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
             self.user_feedback_pub.publish(f"I encountered an error while processing your request. Please try again.")
 
     def execute_planning(self, disassembly_plan):
@@ -249,12 +270,13 @@ class ManagerAgent:
             return PlanExecutionResponse(success=False, execution_details="Planning service unavailable")
         
         try:
-            rospy.loginfo(f"[ManagerAgent] Sending plan to Planning Agent: {disassembly_plan}")
+            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Sending plan to Planning Agent: {{}}".format(rospy.get_time(), disassembly_plan))
             planning_response = self.plan_execution(disassembly_plan)
-            rospy.loginfo(f"[ManagerAgent] Received response from Planning Agent: {planning_response}")
+            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Received response from Planning Agent: {{}}".format(rospy.get_time(), planning_response))
             return planning_response
         except rospy.ServiceException as e:
-            rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
+            error_message = f"[ManagerAgent] Planning service call failed: {e}"
+            self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
             return PlanExecutionResponse(success=False, execution_details=f"Planning service error: {str(e)}")
 
     def run_system_test(self):
@@ -262,18 +284,24 @@ class ManagerAgent:
         self.user_feedback_pub.publish("Running system test...")
 
         # Test Structural Engineer Agent
-        try:
-            validation_response = self.validate_request("Test disassembly request")
-            self.user_feedback_pub.publish(f"Structural Engineer Agent test result: {validation_response.validation_details}")
-        except Exception as e:
-            self.user_feedback_pub.publish(f"Structural Engineer Agent test failed: {str(e)}")
+        if self.validate_request is not None:
+            try:
+                validation_response = self.validate_request("Test disassembly request")
+                self.user_feedback_pub.publish(f"Structural Engineer Agent test result: {validation_response.validation_details}")
+            except Exception as e:
+                self.user_feedback_pub.publish(f"Structural Engineer Agent test failed: {str(e)}")
+        else:
+            self.user_feedback_pub.publish("Structural Engineer Agent is not available")
 
         # Test Stability Agent
-        try:
-            stability_response = self.stability_analysis("Test stability analysis")
-            self.user_feedback_pub.publish(f"Stability Agent test result: {'Safe' if stability_response.is_safe else 'Unsafe'}")
-        except Exception as e:
-            self.user_feedback_pub.publish(f"Stability Agent test failed: {str(e)}")
+        if self.stability_analysis is not None:
+            try:
+                stability_response = self.stability_analysis("Test stability analysis")
+                self.user_feedback_pub.publish(f"Stability Agent test result: {'Safe' if stability_response.is_safe else 'Unsafe'}")
+            except Exception as e:
+                self.user_feedback_pub.publish(f"Stability Agent test failed: {str(e)}")
+        else:
+            self.user_feedback_pub.publish("Stability Agent is not available")
 
         self.user_feedback_pub.publish("System test completed.")
 
