@@ -23,7 +23,7 @@ class StabilityAgent:
         self.openai_api_key = rospy.get_param('/openai_api_key')
 
         # Initialize ChatOpenAI
-        self.llm = ChatOpenAI(temperature=0, model="gpt-4o", openai_api_key=self.openai_api_key) # type: ignore
+        self.llm = ChatOpenAI(temperature=0, model="gpt-4o", openai_api_key=self.openai_api_key) #use gpt-4o it is the latest model
 
         # Initialize RAG system 
         self.initialize_rag_system()

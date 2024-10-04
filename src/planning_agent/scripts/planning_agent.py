@@ -50,7 +50,7 @@ class PlanningAgent:
         })
 
         # Initialize LangChain components
-        self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-4o", temperature=0) #use gpt-4o it is the latest model
         self.output_parser = PydanticOutputParser(pydantic_object=ActionSequence)
 
         # Set up ROS service
@@ -197,7 +197,7 @@ class PlanningAgent:
             invalid_actions = []
             for action in item.planning_sequence:
                 action_name = action.split('(')[0]  # Extract action name
-                if not any(action_name == valid for valid in self.robot_actions.keys()):
+                if not any(action_name == valid for valid in self.robot_actions.keys()): # type: ignore
                     invalid_actions.append(action)
 
             if invalid_actions:
@@ -215,7 +215,7 @@ class PlanningAgent:
         rospy.loginfo(f"Writing JSON file to directory: {robot_sequence_dir}")
         
         if not os.path.exists(robot_sequence_dir):
-            os.makedirs(robot_sequence_dir)
+            os.makedirs(robot_sequence_dir) # type: ignore
         
         timestamp = rospy.get_time()
         json_file_name = f"action_sequence_{timestamp}.json"

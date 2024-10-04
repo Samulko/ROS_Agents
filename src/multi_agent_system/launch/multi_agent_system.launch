@@ -17,7 +17,11 @@
     <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
 
     <!-- Structural Engineer Agent Node -->
-    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen" />
+    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen"
+          launch-prefix="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/bin/python3">
+        <env name="PYTHONPATH" value="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/lib/python3.10/site-packages:$(env PYTHONPATH)"/>
+        <env name="PATH" value="$(env HOME)/Documents/GitHub/ros_noetic_311/venv_ros_py310/bin:$(env PATH)"/>
+    </node>
 
     <!-- Planning Agent Node -->
     <node name="planning_agent" pkg="planning_agent" type="planning_agent.py" output="screen"
