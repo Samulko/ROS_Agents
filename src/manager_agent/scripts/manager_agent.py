@@ -208,7 +208,6 @@ class ManagerAgent:
         try:
             # Validate the request with Structural Engineer Agent
             validation_response = self.validate_request(command)
-            disassembly_plan = validation_response.disassembly_plan
 
             self.log_conversation(f"[INFO] [{{:.6f}}]: StructuralEngineerAgent: Validation result: {{}}".format(rospy.get_time(), validation_response.validation_details))
 
@@ -216,8 +215,16 @@ class ManagerAgent:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request follows standard procedures.")
                 
+                # Create a comprehensive plan
+                comprehensive_plan = {
+                    "description_of_structure": validation_response.description_of_structure,
+                    "components": validation_response.components,
+                    "disassembly_instructions": validation_response.disassembly_instructions,
+                    "actor_assignments": validation_response.actor_assignments
+                }
+                
                 # Proceed with planning for standard requests
-                planning_response = self.execute_planning(disassembly_plan)
+                planning_response = self.execute_planning(comprehensive_plan)
                 
                 if planning_response.success:
                     self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
@@ -263,15 +270,15 @@ class ManagerAgent:
             self.log_conversation(f"[ERROR] [{{:.6f}}]: {{}}".format(rospy.get_time(), error_message))
             self.user_feedback_pub.publish(f"I encountered an error while processing your request. Please try again.")
 
-    def execute_planning(self, disassembly_plan):
+    def execute_planning(self, comprehensive_plan):
         if self.plan_execution is None:
             rospy.logwarn("[ManagerAgent] Planning Agent service is not available.")
             self.user_feedback_pub.publish("I'm sorry, but I can't perform planning at the moment. Please try again later.")
             return PlanExecutionResponse(success=False, execution_details="Planning service unavailable")
         
         try:
-            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Sending plan to Planning Agent: {{}}".format(rospy.get_time(), disassembly_plan))
-            planning_response = self.plan_execution(disassembly_plan)
+            self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Sending comprehensive plan to Planning Agent: {{}}".format(rospy.get_time(), comprehensive_plan))
+            planning_response = self.plan_execution(json.dumps(comprehensive_plan))
             self.log_conversation(f"[INFO] [{{:.6f}}]: [ManagerAgent] Received response from Planning Agent: {{}}".format(rospy.get_time(), planning_response))
             return planning_response
         except rospy.ServiceException as e:

@@ -2,4 +2,7 @@ string request
 ---
 bool is_standard
 string validation_details
-string disassembly_plan
+string description_of_structure
+string[] components
+string[] disassembly_instructions
+string[] actor_assignments
