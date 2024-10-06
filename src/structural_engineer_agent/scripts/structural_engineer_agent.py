@@ -216,7 +216,7 @@ class StructuralEngineerAgent:
             rospy.loginfo(f"StructuralEngineerAgent: Retrieved context: {context}")
 
             response = self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o", #use gpt-4o it is the latest model
                 temperature=0,
                 response_model=EngineerResponse,
                 messages=[

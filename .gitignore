@@ -20,6 +20,7 @@ venv_ros_noetic/
 aider_venv/
 aider_venv_311/
 .aider*
+venv_ros_py311/
 
 # Environment variables
 .env
