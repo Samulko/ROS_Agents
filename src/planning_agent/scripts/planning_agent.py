@@ -59,17 +59,11 @@ class PlanningAgent:
         rospy.loginfo("Planning Agent Initialized and ready to work.")
 
     def handle_plan_execution(self, req):
-        comprehensive_plan = json.loads(req.plan)
-        rospy.loginfo(f"Planning Agent: Received comprehensive plan: {comprehensive_plan}")
+        plan = req.plan
+        rospy.loginfo(f"Planning Agent: Received plan execution request: {plan}")
 
-        # Extract the necessary information from the comprehensive plan
-        description = comprehensive_plan['description_of_structure']
-        components = comprehensive_plan['components']
-        disassembly_instructions = comprehensive_plan['disassembly_instructions']
-        actor_assignments = comprehensive_plan['actor_assignments']
-
-        # Use this information to create a more detailed action sequence
-        action_sequence = self.create_detailed_action_sequence(description, components, disassembly_instructions, actor_assignments)
+        # Translate plan into structured action sequences
+        action_sequence = self.translate_plan(plan)
 
         if action_sequence is None:
             return PlanExecutionResponse(success=False, execution_details="Failed to generate a valid action sequence.")
@@ -88,51 +82,95 @@ class PlanningAgent:
         else:
             return PlanExecutionResponse(success=False, execution_details="Invalid action sequence. Please check the plan and try again.")
 
-    def create_detailed_action_sequence(self, description, components, disassembly_instructions, actor_assignments):
-        rospy.loginfo(f"Planning Agent: Creating detailed action sequence")
-        rospy.loginfo(f"Description: {description}")
-        rospy.loginfo(f"Components: {components}")
-        rospy.loginfo(f"Disassembly Instructions: {disassembly_instructions}")
-        rospy.loginfo(f"Actor Assignments: {actor_assignments}")
-
+    def translate_plan(self, plan):
+        rospy.loginfo(f"Planning Agent: Translating plan: {plan}")
         action_schemas = ', '.join(f"{key}: {value}" for key, value in self.robot_actions.items())
         
-        prompt = ChatPromptTemplate.from_template(
+        example_json = '''
+        {
+          "actions": [
+            {
+              "human_working": false,
+              "selected_element": "element_2",
+              "planning_sequence": ["moveto", "holding"]
+            },
+            {
+              "human_working": true,
+              "selected_element": "element_1",
+              "planning_sequence": ["human_action(remove column 1)"]
+            }
+          ]
+        }
+        '''
+        
+        # Step 1: Extract Numbered Instructions and Preferences
+        step1_prompt = ChatPromptTemplate.from_template(
             "You are the Planning Agent in a multi-agent system that controls a robotic arm for disassembly tasks. "
-            "Your task is to create a detailed action sequence based on the following information:\n\n"
-            "Structure Description: {description}\n\n"
-            "Components:\n{components}\n\n"
-            "Disassembly Instructions:\n{disassembly_instructions}\n\n"
-            "Actor Assignments:\n{actor_assignments}\n\n"
-            "Create a detailed action sequence following these guidelines:\n"
+            "Your first task is to extract the numbered Disassembly Instructions and any additional actor preferences from the plan below.\n\n"
+            "**Plan:**\n{plan}\n\n"
+            "Please provide:\n"
+            "1. The numbered Disassembly Instructions exactly as they appear.\n"
+            "2. Any additional actor preferences or constraints mentioned in the plan."
+        )
+        
+        step1_chain = LLMChain(llm=self.llm, prompt=step1_prompt, verbose=True)
+        extraction_result = step1_chain.run(plan=plan)
+        
+        # Parse the extraction result
+        instructions_and_preferences = self.parse_extraction_result(extraction_result)
+        
+        # Step 2: Interpret Instructions Step by Step
+        step2_prompt = ChatPromptTemplate.from_template(
+            "Now, interpret each of the numbered Disassembly Instructions step by step. For each instruction, do the following:\n"
+            "1. Identify the actor (human or robot) performing the action, prioritizing the stated preferences.\n"
+            "2. Determine the specific element being worked on.\n"
+            "3. Decide which action schemas are needed to perform this instruction.\n"
+            "4. Explain your reasoning, ensuring it aligns with the stated preferences.\n\n"
+            "**Numbered Instructions:**\n{numbered_instructions}\n\n"
+            "**Additional Preferences:**\n{additional_preferences}\n\n"
+            "Remember to only use the following action schemas:\n{action_schemas}\n\n"
+            "Proceed step by step, always prioritizing the stated preferences over default assumptions."
+        )
+        
+        step2_chain = LLMChain(llm=self.llm, prompt=step2_prompt, verbose=True)
+        interpreted_steps = step2_chain.run(
+            numbered_instructions=instructions_and_preferences['instructions'],
+            additional_preferences=instructions_and_preferences['preferences'],
+            action_schemas=action_schemas
+        )
+        
+        # Step 3: Generate the Action Sequence
+        step3_prompt = ChatPromptTemplate.from_template(
+            "Based on your interpretations, generate the action sequence in JSON format. Follow these guidelines:\n"
+            "- Strictly adhere to the preferences for human-robot task division stated in the initial prompt\n"
             "- Use 'human_working' set to true if a human is performing the action, false if the robot is.\n"
             "- 'selected_element' should specify the element being worked on.\n"
             "- 'planning_sequence' should list the actions in execution order, using only the provided action schemas.\n"
-            "- Ensure the sequence follows the exact order of the disassembly instructions.\n"
-            "- Maintain consistent roles for each actor throughout the process, as per the actor assignments.\n"
+            "- Ensure the sequence follows the exact order of the numbered instructions.\n"
+            "- Maintain consistent roles for each actor throughout the process, as per the stated preferences.\n"
             "- Include necessary preparatory movements before each main action.\n"
             "- For human actions, use 'human_action(action_description)'.\n"
-            "- Use specific component IDs (e.g., 'column_1') as mentioned in the components list.\n"
+            "- Use specific element names (e.g., 'element_1').\n"
             "- Robot pick-and-place sequences should follow: 'moveto' -> 'picking' -> 'holding' -> 'placing'.\n"
             "- Support actions should follow: 'moveto' -> 'holding', and continue 'holding' until released.\n"
             "- Use 'deposition_zone' as the destination for removed elements.\n\n"
-            "Remember to only use the following action schemas:\n{action_schemas}\n\n"
-            "Provide the final action sequence in the following JSON format:\n{format_instructions}"
+            "**Your Interpretations:**\n{interpreted_steps}\n\n"
+            "**Additional Preferences:**\n{additional_preferences}\n\n"
+            "Provide the final action sequence in the following JSON format:\n{format_instructions}\n\n"
+            "Here is an example:\n{example_json}"
         )
         
-        chain = LLMChain(llm=self.llm, prompt=prompt, verbose=True)
-        result = chain.run(
-            description=description,
-            components=json.dumps(components, indent=2),
-            disassembly_instructions=json.dumps(disassembly_instructions, indent=2),
-            actor_assignments=json.dumps(actor_assignments, indent=2),
-            action_schemas=action_schemas,
-            format_instructions=self.output_parser.get_format_instructions()
+        step3_chain = LLMChain(llm=self.llm, prompt=step3_prompt, verbose=True)
+        final_result = step3_chain.run(
+            interpreted_steps=interpreted_steps,
+            additional_preferences=instructions_and_preferences['preferences'],
+            format_instructions=self.output_parser.get_format_instructions(),
+            example_json=example_json
         )
         
         try:
-            action_sequence = self.output_parser.parse(result)
-            rospy.loginfo(f"Planning Agent: Created detailed action sequence: {action_sequence}")
+            action_sequence = self.output_parser.parse(final_result)
+            rospy.loginfo(f"Planning Agent: Translated plan into action sequence: {action_sequence}")
             return action_sequence
         except Exception as e:
             rospy.logerr(f"Planning Agent: Failed to generate action sequence: {e}")

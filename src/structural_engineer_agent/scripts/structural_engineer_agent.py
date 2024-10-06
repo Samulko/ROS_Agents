@@ -210,7 +210,7 @@ class StructuralEngineerAgent:
 
             docs = self.vectorstore.similarity_search(request, k=2)
             if not docs:
-                return ValidateRequestResponse(is_standard=False, validation_details="No relevant information found in the RAG system.", disassembly_plan="")
+                return ValidateRequestResponse(is_standard=False, validation_details="No relevant information found in the RAG system.")
 
             context = "\n".join([doc.page_content for doc in docs])
             rospy.loginfo(f"StructuralEngineerAgent: Retrieved context: {context}")
@@ -233,14 +233,13 @@ class StructuralEngineerAgent:
             self.export_response(request, response)
 
             validation_details = json.dumps(response.dict(), indent=2)
-            disassembly_plan = "\n".join([step.step for step in response.disassembly_instructions])
 
             self.structural_engineer_feedback_pub.publish(f"Validation result: {validation_details}")
 
-            return ValidateRequestResponse(is_standard=response.is_standard, validation_details=validation_details, disassembly_plan=disassembly_plan)
+            return ValidateRequestResponse(is_standard=response.is_standard, validation_details=validation_details)
         except Exception as e:
             rospy.logerr(f"StructuralEngineerAgent: Error handling validate request: {str(e)}")
-            return ValidateRequestResponse(is_standard=False, validation_details=f"Error: {str(e)}", disassembly_plan="")
+            return ValidateRequestResponse(is_standard=False, validation_details=f"Error: {str(e)}")
 
     def export_response(self, request, response):
         export_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'engineer_response')
